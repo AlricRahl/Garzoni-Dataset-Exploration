@@ -34,17 +34,28 @@ def getReport(data, name):
                             minimal = True)
     profile.to_file(f'../reports/{name.title()}_Profile_Report.html')
 
-if __name__ == "__main__":
-    files = {
-        'contracts': "../data/contracts_20200514_194518.json",
-        'locations': "../data/locations_20200514_203113.json",
-        'persons': "../data/persons_20200514_201258.json",
-        'mentions': "../data/person_mentions_20200514_194949.json",
-        'relationships': "../data/person_relationships_20200514_201308.json",
-        'professions': "../data/professions_20200514_203119.json",
-        'categories': "../data/profession_categories_20200514_203123.json"
-    }
+def amendNextract(frame, column):
+    """ This function takes a dataframe, and a column with dict values in it 
+    Then converts the column into a separate frame.
+    TODO: We can have a key column as an input as well, so once we create 
+    frames for everything, we can make one massive table to profile
 
-    for name, file in files.items():
-        frame = readFile(file, name)
-        getReport(frame, name)
+    """
+    tags = set()
+    columnArr = frame[column].to_numpy()
+    for item in columnArr:
+        if type(item) is not float:
+            tags = tags.union(set(item.keys()))
+    
+    null = dict()
+    for item in tags:
+        null[item] = None
+
+
+    newFrame = list()
+    for item in columnArr:
+        if type(item) is not float:
+            temp = null.copy()
+            temp.update(item)
+            newFrame.append(temp)
+    return pd.DataFrame(newFrame)
