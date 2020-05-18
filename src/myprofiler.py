@@ -26,8 +26,7 @@ def getReport(data, name):
     """Takes in the read data, creates a pandas report out of it
 
     :data: pandas dataframe
-    :returns: TODO
-
+    TODO: Take custom configs to increase the speed of report generation
     """
     print(f'Profiling {name}...')
     profile = ProfileReport(data, title=f'{name.title()} Profile Report',
@@ -50,7 +49,6 @@ def amendNextract(frame, column):
     null = dict()
     for item in tags:
         null[item] = None
-
 
     newFrame = list()
     for item in columnArr:

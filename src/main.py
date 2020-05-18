@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-import profile
-
+from myprofiler import readFile, getReport, amendNextract
 
 if __name__ == "__main__":
     files = {
@@ -13,10 +12,26 @@ if __name__ == "__main__":
         'professions': "../data/professions_20200514_203119.json",
         'categories': "../data/profession_categories_20200514_203123.json"
     }
-
+    # Here we create the initial reports
     # for name, file in files.items():
-        # frame = profile.readFile(file, name)
-        # profile.getReport(frame, name)
+        # frame = readFile(file, name)
+        # getReport(frame, name)
     
-    pM = readFile(files['personMentions'], 'personMentions')
+    # After observing missing parts in reports, we extract some columns as
+    # new dataframes and analyze them separately
+    # These are the columns with dictionaries
+    dict_variables = {
+        'persons': ['relationships'],
+        'professions': None,
+        'contracts': ['mentions'],
+        'personRelationships': None,
+        'personMentions': ['name', 'entity', 'professions', 'workshop',
+                           'geoOrigin', 'chargeLocation', 'residence'],
+        'locations': None 
+    }
 
+    # Here we decide only these are worth reporting
+    pM = readFile(files['personMentions'], 'personMentions')
+    for item in ['workshop', 'name']:
+        frame = amendNextract(pM, item)
+        getReport(frame, item)
