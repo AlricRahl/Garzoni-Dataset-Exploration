@@ -1,37 +1,28 @@
-import pandas as pd
-import numpy as np
-from myprofiler import readFile, getReport, amendNextract
+import myprofiler as mp
+
+from tqdm import tqdm
 
 if __name__ == "__main__":
     files = {
-        'contracts': "../data/contracts_20200514_194518.json",
-        'locations': "../data/locations_20200514_203113.json",
-        'persons': "../data/persons_20200514_201258.json",
-        'personMentions': "../data/person_mentions_20200514_194949.json",
-        'personRelationships': "../data/person_relationships_20200514_201308.json",
-        'professions': "../data/professions_20200514_203119.json",
-        'categories': "../data/profession_categories_20200514_203123.json"
+        'contracts': "../data/contracts_20200514_194518.xlsx",
+        "locations": "../data/locations_20200520_143742.xlsx",
+        "persons": "../data/persons_20200520_143122.xlsx",
+        "personMentions": "../data/person_mentions_20200520_143017.xlsx",
+        "personRelationships":
+        "../data/person_relationships_20200520_143219.xlsx",
+        "professions": "../data/professions_20200520_143812.xlsx",
+        "categories": "../data/profession_categories_20200520_143818.xlsx",
     }
-    # Here we create the initial reports
-    # for name, file in files.items():
-        # frame = readFile(file, name)
-        # getReport(frame, name)
     
-    # After observing missing parts in reports, we extract some columns as
-    # new dataframes and analyze them separately
-    # These are the columns with dictionaries
-    dict_variables = {
-        'persons': ['relationships'],
-        'professions': None,
-        'contracts': ['mentions'],
-        'personRelationships': None,
-        'personMentions': ['name', 'entity', 'professions', 'workshop',
-                           'geoOrigin', 'chargeLocation', 'residence'],
-        'locations': None 
-    }
+    print("Extracting sheets from contracts...")
+    temp = mp.readFromXlsx("../data/contracts_20200520_142649.xlsx",
+                           contracts_sheets)
 
-    # Here we decide only these are worth reporting
-    pM = readFile(files['personMentions'], 'personMentions')
-    for item in ['workshop', 'name']:
-        frame = amendNextract(pM, item)
-        getReport(frame, item)
+    print("Reporting each contracts sheet...")
+    for sheet_frame in tqdm(contracts_sheets):
+        mp.getReport(temp[sheet_frame], "_".join(sheet_frame.split()))
+
+    print("Extracting and Reporting Rest of the xlsx documents...")
+    for name, file in tqdm(files.items()):
+        temp = mp.readFromXlsx(file)
+        mp.getReport(temp, name)
