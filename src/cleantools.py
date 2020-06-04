@@ -1,8 +1,7 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-from tqdm import tqdm
 from math import nan
 import pickle as pkl
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def saveExcel(df, filename, sheetname="Sheet1"):
@@ -37,14 +36,14 @@ def isInt(x):
     try:
         int(x)
         return True
-    except ValueError as e:
+    except ValueError:
         return False
 
 
 def plotHist(df, atype=int, **kwargs):
     try:
         plt.clf()
-    except:
+    except Exception:
         print("Pass")
     df.astype(atype).plot.hist(**kwargs)
     plt.show()
@@ -65,8 +64,7 @@ def currencyMap(cur):
         return 1
     elif cur == "grz:Lire":
         return 20
-    else:
-        return nan
+    return nan
 
 
 def daysToHuman(time):
@@ -77,6 +75,19 @@ def daysToHuman(time):
     months = time // 30
     days = time % 30
     return f"{years}/{months}/{days}"
+
+
+def betweenYears(df, start, end, date_column):
+    """Slices a dataframe for the given dates
+
+    :df: TODO
+    :start: TODO
+    :end: TODO
+    :returns: TODO
+
+    """
+    return df[(df[date_column].apply(lambda x: int(x.split("-")[0])) > start) &
+              (df[date_column].apply(lambda x: int(x.split("-")[0])) < end)]
 
 
 def cleanColumns(df, to_go, eliminate_list=None):
