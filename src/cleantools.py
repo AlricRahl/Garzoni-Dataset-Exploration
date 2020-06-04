@@ -4,6 +4,7 @@ from tqdm import tqdm
 from math import nan
 import pickle as pkl
 
+
 def saveExcel(df, filename, sheetname="Sheet1"):
     """Takes in a data frame, filename, and possibly sheetname, writes the
     dataframe in an excel file
@@ -16,7 +17,7 @@ def saveExcel(df, filename, sheetname="Sheet1"):
 
 def savePickle(df, filename):
     """Pickles frames"""
-    with open("../data/pickles/"+filename, "wb") as file:
+    with open(filename, "wb") as file:
         pkl.dump(df, file)
 
 
