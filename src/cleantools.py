@@ -20,6 +20,12 @@ def savePickle(df, filename):
         pkl.dump(df, file)
 
 
+def loadPickle(filename):
+    """Loads from given pickle"""
+    with open(filename, "rb") as file:
+        return pkl.load(file)
+
+
 def isInt(x):
     """Takes a string and checks if it can turn into int
 
