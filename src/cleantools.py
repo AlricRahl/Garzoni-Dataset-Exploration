@@ -111,3 +111,17 @@ def cleanColumns(df, to_go, eliminate_list=None):
         if not skip:
             cleaned.append(title)
     return df[cleaned]
+
+
+def hotEncode(df, attribute, group="Contract ID"):
+    """Takes a df and an attribute, return dummy hot encodings
+
+    :df: TODO
+    :attribute: TODO
+    :groups: TODO
+    :returns: TODO
+
+    """
+    return pd.concat([df[[group]],
+                      attribute.str.get_dummies()],
+                     axis=1).groupby([group]).sum().reset_index()
