@@ -4,16 +4,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def saveExcel(df, filename, sheetname="Sheet1"):
-    """Takes in a data frame, filename, and possibly sheetname, writes the
-    dataframe in an excel file
-
-    """
-    with pd.ExcelWriter(filename, engine="xlsxwriter") as writer:
-        df.to_excel(writer, sheet_name=sheetname)
-        writer.save()
-
-
 def savePickle(df, filename):
     """Pickles frames"""
     with open(filename, "wb") as file:
@@ -113,7 +103,7 @@ def cleanColumns(df, to_go, eliminate_list=None):
     return df[cleaned]
 
 
-def hotEncode(df, attribute, group="Contract ID"):
+def hotEncode(df, attribute, group="Contract ID", operation="sum"):
     """Takes a df and an attribute, return dummy hot encodings
 
     :df: TODO
@@ -124,4 +114,4 @@ def hotEncode(df, attribute, group="Contract ID"):
     """
     return pd.concat([df[[group]],
                       attribute.str.get_dummies()],
-                     axis=1).groupby([group]).sum().reset_index()
+                     axis=1).groupby([group]).agg(operation).reset_index()
