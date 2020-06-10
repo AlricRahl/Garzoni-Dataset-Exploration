@@ -1,3 +1,4 @@
+from datetime import datetime
 from math import nan
 import pickle as pkl
 import matplotlib.pyplot as plt
@@ -67,7 +68,8 @@ def daysToHuman(time):
     return f"{years}/{months}/{days}"
 
 
-def betweenYears(df, start, end, date_column):
+def betweenYears(df, s_year, date_column="Contract Date", s_month=1, s_day=1, 
+                 e_year=1820, e_month=1, e_day=1):
     """Slices a dataframe for the given dates
 
     :df: TODO
@@ -76,10 +78,10 @@ def betweenYears(df, start, end, date_column):
     :returns: TODO
 
     """
-    return df[(df[date_column].apply(lambda x: int(x.split("-")[0])) > start) &
-              (df[date_column].apply(lambda x: int(x.split("-")[0])) < end)]
-
-
+    return df[(df[date_column] > datetime(s_year+200,s_month,s_day)) &
+              (df[date_column] < datetime(e_year+200,e_month,e_day))]
+    
+    
 def cleanColumns(df, to_go, eliminate_list=None):
     """This dataframe takes a dataframe and column names do delete
     Then deletes those columns. Furthermore, it takes can eliminate columns
