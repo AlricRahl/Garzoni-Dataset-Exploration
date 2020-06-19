@@ -19,15 +19,10 @@ class myRegressor:
 
     """This class is to create a logistic regression."""
 
-    def __init__(self):
-        """This it the constructor of the class """
-        self.data = None
-        self.x_data = None
-        self.y_data = None
-        self.x_train = None
-        self.y_train = None
-        self.target = None
-        self.column_list = [
+    def __init__(
+        self,
+        column_list=[
+            "Contract Date",
             "Contract ID",
             "Has BoContract",
             "Has Flee",
@@ -50,8 +45,18 @@ class myRegressor:
             "Paid Salary in Goods",
             "Total Payment Received",
             "From Venezia",
-        ]
+        ],
+    ):
+        """This it the constructor of the class """
+        self.data = None
+        self.x_data = None
+        self.y_data = None
+        self.x_train = None
+        self.y_train = None
+        self.target = None
         self.selected_features = None
+        self.coef_table = None
+        self.column_list = column_list
         self.regressor = LogisticRegression()
 
     def loadData(
@@ -66,46 +71,55 @@ class myRegressor:
             "prod. di calzature",
             "lav. di metalli comuni",
         ],
-        outlier_removal=True,
+        has_date="Contract Date",
+        outlier_list=[
+            "Apprentice Age",
+            "Duration - Merged",
+            "Total Payment Received",
+        ],
     ):
         """Takes in a dataframe, loads it to itself
 
         """
-        # df = clnt.loadPickle("../data/pickles/table_of_all.pkl").reset_index()
         venezia_encoding = clnt.hotEncode(
             df, df["Apprentice Province"], operation="max"
         )[["Contract ID", "Venezia"]]
         venezia_encoding.columns = ["Contract ID", "From Venezia"]
-        merged = df.merge(venezia_encoding, on="Contract ID").copy()
+        merged = df.merge(venezia_encoding, on="Contract ID",
+                          how="left").copy()
         del merged["Apprentice Province"]
         # Take the necessary part only
         merged = merged[self.column_list]
         merged = merged.set_index("Contract ID")
         # Lose na cells in data
+        print("Before drop na columns", len(merged))
         merged = merged.dropna()
+        if has_date:
+            merged = clnt.normalizeTime(merged, has_date)
         if seperateLabels:
             merged = self.sepLabels(merged, seperateLabels)
         else:
             del merged["Parent Label"]
 
         self.target = target
-        self.loadDataHelper(merged.copy(), outlier_removal=outlier_removal)
+        self.loadDataHelper(merged.copy(), outlier_list=outlier_list)
 
-        print("Oversample Size", len(self.x_train))
+        print("Total Size", len(self.data))
+        print("Training Size", len(self.x_train))
         print("Number of 1s in target", np.sum(self.y_train))
         print(
             "Number of 0s in target", len(self.x_train) - np.sum(self.y_train)
         )
 
-    def loadDataHelper(self, data, outlier_removal=False):
+    def loadDataHelper(self, data, outlier_list=[]):
         """Takes in a data set, divides it to x, y, train, test
         :returns: TODO
 
         """
         self.data = data
-        if outlier_removal:
-            self.cleanOutliers()
-
+        print("Before outlier clean", len(data))
+        if outlier_list:
+            self.cleanOutliers(loC=outlier_list)
         # Get the X data
         x_data = self.data.copy()
         del x_data[self.target]
@@ -116,7 +130,12 @@ class myRegressor:
         # Get the Y data
         self.y_data = self.data[self.target].copy()
 
-        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
+        (
+            self.x_train,
+            self.x_test,
+            self.y_train,
+            self.y_test,
+        ) = train_test_split(
             self.x_data, self.y_data, test_size=0.25, random_state=42
         )
 
@@ -134,10 +153,7 @@ class myRegressor:
         return df
 
     def cleanOutliers(
-        self,
-        loC=["Apprentice Age", "Duration - Merged", "Total Payment Received"],
-        lower=0.02,
-        higher=0.97,
+        self, loC, lower=0.02, higher=0.97,
     ):
         """Takes in a list of outliers, and lower and upper quantiles, then
         eliminates those quantiles from the data
@@ -156,6 +172,7 @@ class myRegressor:
                     | (df[a] > df[a].quantile(lower))
                 )
             ]
+        self.data = df.copy()
 
     def getReport(self, getGraph=True, getMarginals=True):
         """Gets a regression model report
@@ -175,6 +192,7 @@ class myRegressor:
                 error[["Index", "Final"]], left_on="index", right_on="Index"
             )[["Index", "Coef", "Final"]]
             coef.columns = ["Feature", "Coefficient", "Error"]
+            self.coef_table = coef.copy()
             _, ax = plt.subplots(figsize=(14, 10))
             ax.plot(0)
             ax.axvline(x=0, color="black")

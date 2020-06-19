@@ -1,5 +1,6 @@
 from datetime import datetime
 from math import nan
+import numpy as np
 import pickle as pkl
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -58,6 +59,21 @@ def currencyMap(cur):
     return nan
 
 
+def dateToDays(x):
+    """Takes a pd.Timestamp object, converts it to number of days"""
+    x = np.array([int(a) for a in str(x.date()).split("-")])
+    return x[0] * 365 + x[1] * 30 + x[2]
+
+
+def normalizeTime(df, column):
+    """Takes a dataframe and the name of the timestamp column,
+    converts it to days, and normalizes it with the minimum present time"""
+    df = df.copy()
+    minTime = dateToDays(df[column].min())
+    df[column] = df[column].apply(dateToDays).apply(lambda x: x - minTime + 1)
+    return df
+
+
 def daysToHuman(time):
     """Takes in a number of days and turns into a readable form
     """
@@ -68,8 +84,16 @@ def daysToHuman(time):
     return f"{years}/{months}/{days}"
 
 
-def betweenYears(df, s_year, date_column="Contract Date", s_month=1, s_day=1, 
-                 e_year=1820, e_month=1, e_day=1):
+def betweenYears(
+    df,
+    s_year,
+    date_column="Contract Date",
+    s_month=1,
+    s_day=1,
+    e_year=1820,
+    e_month=1,
+    e_day=1,
+):
     """Slices a dataframe for the given dates
 
     :df: TODO
@@ -78,10 +102,12 @@ def betweenYears(df, s_year, date_column="Contract Date", s_month=1, s_day=1,
     :returns: TODO
 
     """
-    return df[(df[date_column] > datetime(s_year+200,s_month,s_day)) &
-              (df[date_column] < datetime(e_year+200,e_month,e_day))]
-    
-    
+    return df[
+        (df[date_column] > datetime(s_year + 200, s_month, s_day))
+        & (df[date_column] < datetime(e_year + 200, e_month, e_day))
+    ]
+
+
 def cleanColumns(df, to_go, eliminate_list=None):
     """This dataframe takes a dataframe and column names do delete
     Then deletes those columns. Furthermore, it takes can eliminate columns
@@ -114,6 +140,9 @@ def hotEncode(df, attribute, group="Contract ID", operation="sum"):
     :returns: TODO
 
     """
-    return pd.concat([df[[group]],
-                      attribute.str.get_dummies()],
-                     axis=1).groupby([group]).agg(operation).reset_index()
+    return (
+        pd.concat([df[[group]], attribute.str.get_dummies()], axis=1)
+        .groupby([group])
+        .agg(operation)
+        .reset_index()
+    )
