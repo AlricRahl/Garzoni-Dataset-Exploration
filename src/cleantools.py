@@ -68,10 +68,8 @@ def dateToDays(x):
 def normalizeTime(df, column):
     """Takes a dataframe and the name of the timestamp column,
     converts it to days, and normalizes it with the minimum present time"""
-    df = df.copy()
     minTime = dateToDays(df[column].min())
     df[column] = df[column].apply(dateToDays).apply(lambda x: x - minTime + 1)
-    return df
 
 
 def daysToHuman(time):
@@ -144,5 +142,4 @@ def hotEncode(df, attribute, group="Contract ID", operation="sum"):
         pd.concat([df[[group]], attribute.str.get_dummies()], axis=1)
         .groupby([group])
         .agg(operation)
-        .reset_index()
     )
