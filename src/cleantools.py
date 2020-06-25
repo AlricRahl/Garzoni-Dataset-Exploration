@@ -18,20 +18,6 @@ def loadPickle(filename):
         return pkl.load(file)
 
 
-def isInt(x):
-    """Takes a string and checks if it can turn into int
-
-    :x: TODO
-    :returns: TODO
-
-    """
-    try:
-        int(x)
-        return True
-    except ValueError:
-        return False
-
-
 def plotHist(df, atype=int, **kwargs):
     try:
         plt.clf()
@@ -143,3 +129,13 @@ def hotEncode(df, attribute, group="Contract ID", operation="sum"):
         .groupby([group])
         .agg(operation)
     )
+
+def filterFrame(df, filterParam: dict, s_year=1530, **kwargs):
+    """Takes in a dataframe, a dictionary of columns and their desired value and extra arguments
+    returns a dataframe with only the desired values on the columns"""
+    df = betweenYears(df, s_year, **kwargs)
+    if not filterParam:
+        return df
+    for key, val in filterParam.items():
+        df = df[df[key] == val]
+    return df

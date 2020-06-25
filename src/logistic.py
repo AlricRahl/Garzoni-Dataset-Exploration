@@ -15,6 +15,25 @@ import statsmodels.api as sm
 import cleantools as clnt
 
 
+def dummyLabels(
+    df,
+    dummy_list=[
+        "prod. e lav. di tessuti e filati",
+        "commercio all'ingrosso e al minuto",
+        "prod. e lav. di generi alimentari",
+        "fabbr. e lav. di oggetti in vetro",
+        "prod. di calzature",
+        "lav. di metalli comuni",
+    ],
+    other=False,
+):
+    dummy_jobs = df["Parent Label"].str.get_dummies()[dummy_list]
+    df = df.join(dummy_jobs, how="left")
+    if other:
+        df["Other Label"] = 1 - np.max(df[dummy_list], axis=1)
+    return df
+
+
 class myRegressor:
 
     """This class is to create a logistic regression."""
