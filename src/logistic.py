@@ -11,6 +11,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 import statsmodels.api as sm
+from statsmodels.formula.api import logit
 
 import cleantools as clnt
 
@@ -32,6 +33,14 @@ def dummyLabels(
     if other:
         df["Other Label"] = 1 - np.max(df[dummy_list], axis=1)
     return df
+
+
+def labelConvert(x, label_columns):
+    """Convert labels to other if not in label_columns"""
+    if x in label_columns:
+        return x
+    else:
+        return "Other_Label"
 
 
 class myRegressor:
@@ -74,6 +83,7 @@ class myRegressor:
         self.y_test = None
         self.target = None
         self.coef_table = None
+        self.formula = None
         self.column_list = column_list
         self.regressor = LogisticRegression()
 
@@ -176,8 +186,14 @@ class myRegressor:
 
         """
         # Load to the Logit model, and assess results
-        logit_model = sm.Logit(self.y_data, self.x_data)
-        result = logit_model.fit(method="bfgs")
+        if not self.formula:
+            logit_model = sm.Logit(self.y_data, self.x_data)
+            result = logit_model.fit(method="bfgs")
+        else:
+            logit_model = logit(
+                self.formula, data=self.x_data.join(self.y_data)
+            )
+            result = logit_model.fit()
 
         # Get summary
         print(result.summary2())
