@@ -218,26 +218,26 @@ class myRegressor:
             self.coef_table = coef.copy()
 
             # Plot two graphs for reference
-            _, ax = plt.subplots(figsize=(14, 10))
-            ax.plot(0)
-            ax.axvline(x=0, color="black")
-            ax.set_title(
-                "Coefficients with Confidence Intervals\nSmaller X range",
-                fontsize=15,
-            )
-            coef.plot.scatter(
-                x="Coefficient",
-                y="Feature",
-                ax=ax,
-                xerr="Error",
-                grid=True,
-                xlim=(-0.35, 0.35),
-            )
+            # _, ax = plt.subplots(figsize=(14, 10))
+            # ax.plot(0)
+            # ax.axvline(x=0, color="black")
+            # ax.set_title(
+                # "Coefficients with Confidence Intervals\nSmaller X range",
+                # fontsize=15,
+            # )
+            # coef.plot.scatter(
+                # x="Coefficient",
+                # y="Feature",
+                # ax=ax,
+                # xerr="Error",
+                # grid=True,
+                # xlim=(-0.35, 0.35),
+            # )
             _, ax2 = plt.subplots(figsize=(14, 10))
             ax2.plot(0)
             ax2.axvline(x=0, color="black")
             ax2.set_title(
-                "Coefficients with Confidence Intervals\nGreater X range",
+                "Coefficients with Confidence Intervals",
                 fontsize=15,
             )
             coef.plot.scatter(
